@@ -55,6 +55,38 @@ The only destructive verb, and it is trash, not delete:
 
 Permanent deletion is not implemented anywhere in this tool.
 
+### `cvrator providers [--json]`
+
+The roll of vaults: every known house with its free tier, automation
+class (`official_api` / `official_cli` / `standard_protocol` /
+`manual_only`), transport, and its caution — inactivity deletion,
+per-file caps, transfer quotas — printed on its face.
+
+### `cvrator catalog build [--provider all|gdrive|onedrive] [--db PATH]`
+
+Censuses each readable provider into one SQLite catalog
+(default `~/.cvrator/catalog.db`). Unconfigured providers are labelled
+and skipped, never silently zeroed. Other providers' rows are left
+standing on a partial rebuild.
+
+### `cvrator catalog stats [--db PATH]` / `cvrator catalog search QUERY [--limit N]`
+
+Stats: build stamp + per-provider and total files/bytes. Search: one
+substring search across every house at once. No hits means *not
+indexed*, never *does not exist*.
+
+### `cvrator archive plan --provider gdrive|onedrive [--older-than-years 10] [--older-than-days N] [--out DIR]`
+
+Names the cold set — files whose provider-reported creation date
+precedes the cutoff (an upload date is not a birth date, and the plan
+says so) — weighs it, and recommends ONE vault from the registry that
+the whole set fits (preference: Filen, MEGA, Backblaze B2, local;
+manual-only providers are never recommended). Writes
+`archive-plan.json` + `archive-plan.csv`. **A plan moves nothing and
+removes nothing.** The migration law for any later move: copy →
+SHA-256 verify at the target → catalog entry → only then, as a
+separate approved step, removal at the source.
+
 ## Python module API
 
 ```python
@@ -74,6 +106,17 @@ from cvrator.onedrive import OneDriveProvider, NotConfigured
   - `list_files() -> [FileRecord]` (complete census, folders excluded)
   - `download(file_id, dest_path)`
   - `trash(file_id) -> True`
+
+- `cvrator.registry.REGISTRY` — the roll of vaults (`ProviderInfo`:
+  free tier, automation class, transport, per-file cap, inactivity
+  days, zero-knowledge, verdict, caution).
+  `recommend_target(total_bytes, largest_file, source_key)` picks one
+  whole-set vault or explains every closed door.
+- `cvrator.catalog` — `build_catalog(db, {provider: [FileRecord]},
+  quotas)`, `catalog_stats(db)`, `search_catalog(db, query)`.
+- `cvrator.archive` — `select_candidates(records, years, days, now)`,
+  `make_plan(records, source_key, ...)` → the archive plan dict,
+  migration law included.
 
 ## Environment variables
 

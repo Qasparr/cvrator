@@ -4,4 +4,4 @@
 # (Greek, -ARR, All Rights Reserved, Without Prejudice).
 # Method of Science, Aim of Religion.
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

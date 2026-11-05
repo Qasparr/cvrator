@@ -8,8 +8,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cvrator"
-version = "0.1.0"
-description = "CVRATOR — steward of cloud stores: byte-identical duplicate management for Google Drive and OneDrive."
+version = "0.2.0"
+description = "CVRATOR — steward of cloud stores: byte-identical duplicate management, a unified catalog over every house, and cold-file archive planning."
 readme = "README.md"
 requires-python = ">=3.9"
 # No third-party dependencies: the standard library plus the house

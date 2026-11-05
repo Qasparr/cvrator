@@ -42,6 +42,18 @@ Latin ordinal **97**, Agrippa **514**.
   only after the exact phrase `TRASH n FILES` is typed, and only into
   the provider's recoverable trash / recycle bin. **Permanent deletion
   is deliberately not implemented.**
+- **The roll of vaults (v0.2)** — a registry of known storage houses,
+  free tiers and killing conditions printed on their faces: inactivity
+  deletion, per-file caps, transfer quotas, missing APIs.
+- **One catalog (v0.2)** — every connected house censused into a single
+  SQLite index: one search, one set of totals, across all providers.
+  Files are never striped across accounts; each sits whole in one
+  vault. Only the *finding* is unified.
+- **Archive plans (v0.2)** — name the cold set (older than ten years by
+  the standing rule) and the one vault the whole set fits. A plan moves
+  nothing; a later move must copy, verify by SHA-256 at the target,
+  enter the catalog, and only then — as a separate approved step —
+  remove the source.
 
 ## Content test (Inputs / Processes / Outputs / Tolerances)
 
@@ -62,6 +74,10 @@ cvrator quota                       # the real storage ledger
 cvrator scan --provider gdrive --out reports
 cvrator scan --provider gdrive --out reports --verify
 cvrator trash --plan reports/gdrive-plan.json
+cvrator providers                   # the roll of known vaults
+cvrator catalog build               # census every house into one index
+cvrator catalog search flag         # find a file across all houses
+cvrator archive plan --provider gdrive --older-than-years 10
 ```
 
 ## Providers
@@ -76,6 +92,22 @@ cvrator trash --plan reports/gdrive-plan.json
   registration, `Files.ReadWrite`). CVRATOR never stores or prints the
   token. Without it the provider reports NOT CONFIGURED and refuses
   work — a labelled door, not a fake wall.
+
+## The wider roll (v0.2)
+
+The steward's registry knows eight houses. Two are live in this tool
+(Google Drive, OneDrive). The archive candidates are **Filen** (10 GB
+free, zero-knowledge, CLI/SDK/WebDAV/S3 doors) and **MEGA** (20 GB free,
+zero-knowledge, transfer quotas), with **Backblaze B2** (10 GB free,
+S3) and **local media** behind them. **Degoo is entered in the roll
+only to be refused as an archive vault**: 20 GB free on paper, but a
+~256 MB per-file cap, free accounts deleted after ~90 days inactive,
+and no official API — a cold archive is precisely what it eats.
+CVRATOR will never automate a move through a reverse-engineered door.
+
+And the name still holds at this scope by its own meaning: a curator's
+charge was never one room — it is the whole household's goods, wherever
+they are kept.
 
 Full command and module reference: [docs/API.md](docs/API.md).
 
