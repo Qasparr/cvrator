@@ -1,0 +1,22 @@
+# CVRATOR — package definition.
+# Authorship attributed exclusively to Johnathan 'Qasparr' Monroe
+# (Greek, -ARR, All Rights Reserved, Without Prejudice).
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cvrator"
+version = "0.1.0"
+description = "CVRATOR — steward of cloud stores: byte-identical duplicate management for Google Drive and OneDrive."
+readme = "README.md"
+requires-python = ">=3.9"
+# No third-party dependencies: the standard library plus the house
+# connector CLI (Google Drive) and Microsoft Graph over HTTPS (OneDrive).
+
+[project.scripts]
+cvrator = "cvrator.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
