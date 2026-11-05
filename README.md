@@ -49,11 +49,14 @@ Latin ordinal **97**, Agrippa **514**.
   SQLite index: one search, one set of totals, across all providers.
   Files are never striped across accounts; each sits whole in one
   vault. Only the *finding* is unified.
-- **Archive plans (v0.2)** — name the cold set (older than ten years by
-  the standing rule) and the one vault the whole set fits. A plan moves
-  nothing; a later move must copy, verify by SHA-256 at the target,
-  enter the catalog, and only then — as a separate approved step —
-  remove the source.
+- **Archive plans (v0.2, widened v0.3)** — name the cold set (older
+  than ten years by the standing rule) and place it, whole files only,
+  across **every** usable vault at once — Filen, MEGA, pCloud,
+  Backblaze B2, local media — under one catalog and one plan. The
+  steward uses the whole roll, not one door. A plan moves nothing; a
+  later move must copy, verify by SHA-256 at the target, enter the
+  catalog, and only then — as a separate approved step — remove the
+  source.
 
 ## Content test (Inputs / Processes / Outputs / Tolerances)
 

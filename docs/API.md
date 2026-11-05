@@ -79,10 +79,14 @@ indexed*, never *does not exist*.
 
 Names the cold set — files whose provider-reported creation date
 precedes the cutoff (an upload date is not a birth date, and the plan
-says so) — weighs it, and recommends ONE vault from the registry that
-the whole set fits (preference: Filen, MEGA, Backblaze B2, local;
-manual-only providers are never recommended). Writes
-`archive-plan.json` + `archive-plan.csv`. **A plan moves nothing and
+says so) — weighs it, and places it, whole files only, across every
+usable vault in the roll (Filen, MEGA, pCloud, Backblaze B2, local
+media), largest files first, each file in exactly one vault. The plan
+carries `allocations` (per-vault file lists), `unassigned` (anything
+no open vault admits), and `target` (the single-vault answer, kept
+for reference). `--include-manual` admits manual-only vaults (Degoo)
+as marked manual placements, never a sole copy; `--no-local` leaves
+local media out. Writes `archive-plan.json` + `archive-plan.csv`. **A plan moves nothing and
 removes nothing.** The migration law for any later move: copy →
 SHA-256 verify at the target → catalog entry → only then, as a
 separate approved step, removal at the source.

@@ -92,6 +92,41 @@ class ArchiveLaw(unittest.TestCase):
         self.assertEqual(plan["target"]["key"], "filen")
 
 
+class AllocationLaw(unittest.TestCase):
+    def test_set_too_big_for_one_vault_spreads_across_the_roll(self):
+        records = [rec("gdrive", str(i), f"f{i}.bin", 4 * GB,
+                       "2010-01-01T00:00:00Z") for i in range(5)]  # 20 GB
+        plan = make_plan(records, "gdrive", years=10, now=NOW)
+        keys = [a["key"] for a in plan["allocations"]]
+        self.assertEqual(keys[0], "filen")
+        self.assertIn("mega", keys)
+        self.assertEqual(plan["unassigned"], [])
+        placed = sum(len(a["files"]) for a in plan["allocations"])
+        self.assertEqual(placed, 5)
+
+    def test_manual_vault_only_when_asked_and_only_within_its_cap(self):
+        records = [rec("gdrive", f"v{i}", f"v{i}.bin", 10 * GB,
+                       "2010-01-01T00:00:00Z") for i in range(5)]
+        records.append(rec("gdrive", "small", "small.bin", 10 * MB,
+                           "2010-01-01T00:00:00Z"))
+        records.append(rec("gdrive", "big", "big.bin", 300 * MB,
+                           "2010-01-01T00:00:00Z"))
+        plan = make_plan(records, "gdrive", years=10, now=NOW,
+                         include_manual=True, use_local=False)
+        degoo = [a for a in plan["allocations"] if a["key"] == "degoo"]
+        self.assertEqual(len(degoo), 1)
+        self.assertEqual(degoo[0]["mode"], "manual")
+        self.assertEqual([f["id"] for f in degoo[0]["files"]], ["small"])
+        self.assertEqual([f["id"] for f in plan["unassigned"]], ["big"])
+
+    def test_no_manual_vault_by_default(self):
+        records = [rec("gdrive", "a", "a.bin", 1 * GB,
+                       "2010-01-01T00:00:00Z")]
+        plan = make_plan(records, "gdrive", years=10, now=NOW)
+        self.assertNotIn("degoo",
+                         [a["key"] for a in plan["allocations"]])
+
+
 if __name__ == "__main__":
     unittest.main()
 

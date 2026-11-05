@@ -260,7 +260,9 @@ def cmd_archive_plan(args):
         return 2
     plan = make_plan(records, args.provider,
                      years=args.older_than_years,
-                     days=args.older_than_days)
+                     days=args.older_than_days,
+                     include_manual=args.include_manual,
+                     use_local=not args.no_local)
     os.makedirs(args.out, exist_ok=True)
     plan_path = os.path.join(args.out, "archive-plan.json")
     with open(plan_path, "w") as fh:
@@ -270,19 +272,27 @@ def cmd_archive_plan(args):
         w = csv.writer(fh)
         w.writerow(["source", "id", "name", "size_bytes", "created",
                     "web_url", "target"])
-        tgt = plan["target"]["key"] if plan["target"] else ""
+        tgt_by_id = {}
+        for a in plan["allocations"]:
+            for f in a["files"]:
+                tgt_by_id[f["id"]] = a["key"]
         for c in plan["candidates"]:
             w.writerow([args.provider, c["id"], c["name"], c["size"],
-                        c["created"], c["web_url"], tgt])
+                        c["created"], c["web_url"],
+                        tgt_by_id.get(c["id"], "")])
     print(f"{args.provider}: {plan['files_seen']:,} files seen; "
           f"{len(plan['candidates'])} cold ({plan['rule']}, before "
           f"{plan['cutoff'][:10]}); {plan['skipped_no_date']} without a "
           f"date, counted apart.")
     print(f"cold set: {human(plan['total_bytes'])} | plan: {plan_path}")
-    if plan["target"]:
-        t = plan["target"]
-        print(f"recommended vault: {t['name']} ({t['key']}) — "
-              f"{t['reason']}")
+    for a in plan["allocations"]:
+        cap = human(a["capacity_bytes"]) if a["capacity_bytes"] \
+            else "no quota wall"
+        print(f"  -> {a['name']} ({a['key']}, {a['mode']}): "
+              f"{len(a['files'])} files, {human(a['bytes'])} of {cap}")
+    if plan["unassigned"]:
+        print(f"  !! {len(plan['unassigned'])} files fit no open "
+              f"vault — they stand unassigned in the plan")
     print("PLAN ONLY — nothing moved, nothing removed.")
     return 0
 
@@ -346,6 +356,11 @@ def main(argv=None):
     ap2.add_argument("--older-than-years", type=float, default=10.0)
     ap2.add_argument("--older-than-days", type=int, default=None)
     ap2.add_argument("--out", default="reports")
+    ap2.add_argument("--include-manual", action="store_true",
+                     help="also place files in manual-only vaults "
+                          "(Degoo), marked manual, never a sole copy")
+    ap2.add_argument("--no-local", action="store_true",
+                     help="leave local media out of the roll")
     ap2.set_defaults(fn=cmd_archive_plan)
 
     args = ap.parse_args(argv)
